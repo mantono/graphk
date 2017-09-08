@@ -1,6 +1,6 @@
 package com.mantono.graphk
 
-data class Edge<T>(val id: String, val source: T, val destination: T, val weight: Double): Comparable<Edge<T>>
+data class Edge<T>(val source: T, val destination: T, val weight: Double, val id: String = ""): Comparable<Edge<T>>
 {
 	override fun equals(obj: Any?): Boolean
 	{
@@ -26,5 +26,5 @@ data class Edge<T>(val id: String, val source: T, val destination: T, val weight
 	override fun toString(): String = "$source -- $weight --> $destination"
 	override fun compareTo(other: Edge<T>): Int = java.lang.Double.compare(this.weight, other.weight)
 
-	fun reverse(): Edge<T> = Edge(id, destination, source, weight)
+	fun reverse(): Edge<T> = Edge(destination, source, weight, id)
 }

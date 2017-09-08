@@ -1,6 +1,5 @@
 package com.mantono.graphk
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import java.util.*
 
 class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
@@ -41,7 +40,7 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 
 	override fun connect(start: T, end: T, weight: Double): Boolean
 	{
-		if (weight < 0.0 and !allowsNegativeWeights)
+		if (weight < 0.0 && !allowsNegativeWeights)
 			throw IllegalArgumentException("Trying to add negative weight ($weight), but negative wegihts are not alllowed")
 		return when(isConnected(start, end))
 		{
@@ -78,6 +77,7 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 				}
 			}
 		}
+		return false
 	}
 
 	private fun removeEdgeForNode(node: T, edge: Edge<T>): Boolean = edges[node]?.remove(edge) == true
