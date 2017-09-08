@@ -63,11 +63,8 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 	{
 		if(nodes.remove(data))
 		{
-			val edgesFromNode: Set<Edge<T>> = edges.remove(data) ?: emptySet()
-			if(directed)
-				removeAllEdgesLeadingToNode(data)
-			else
-				removeAllEdgesLeadingToNode(data, edgesFromNode)
+			disconnect(data)
+			return true
 		}
 		return false
 	}
@@ -76,8 +73,29 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 	{
 		for(node in nodes)
 		{
-			val edgesFromNode: Set<Edge<T>>  = edges[node] ?: emptySet()
+			val edgesFromNode: MutableSet<Edge<T>>  = edges[node] ?: HashSet(0)
+			val iter: MutableIterator<Edge<T>> = edgesFromNode.iterator()
+			while(iter.hasNext())
+			{
+				val edge = iter.next()
+				if (edge.destination == node)
+					iter.remove()
+			}
+		}
+	}
 
+	private fun removeAllEdgesLeadingToNode(data: T, )
+	{
+		for(node in nodes)
+		{
+			val edgesFromNode: MutableSet<Edge<T>>  = edges[node] ?: HashSet(0)
+			val iter: MutableIterator<Edge<T>> = edgesFromNode.iterator()
+			while(iter.hasNext())
+			{
+				val edge = iter.next()
+				if (edge.destination == node)
+					iter.remove()
+			}
 		}
 	}
 
@@ -94,6 +112,22 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 			}
 		}
 		return false
+	}
+
+	private fun disconnect(node: T)
+	{
+		if(directed)
+		{
+			edges.asSequence()
+				.map { it.value }
+				.flatMap { it.asSequence() }
+				.filter { it.source == node || it.destination == node }
+				.forEach { disconnect(it.source, it.destination) }
+		}
+		else
+		{
+			edgesFor(node).forEach { disconnect(it.destination, it.source) }
+		}
 	}
 
 	private fun removeEdgeForNode(node: T, edge: Edge<T>): Boolean = edges[node]?.remove(edge) == true
