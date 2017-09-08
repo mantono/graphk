@@ -1,6 +1,8 @@
 package com.mantono.graphk
 
-data class Edge<T>(val source: T, val destination: T, val weight: Double, val id: String = ""): Comparable<Edge<T>>
+import java.util.concurrent.Semaphore
+
+data class Edge<T>(val source: T, val destination: T, val distance: Double, val id: String = "", val lock: Semaphore = Semaphore(1)): Comparable<Edge<T>>
 {
 	override fun equals(obj: Any?): Boolean
 	{
@@ -16,15 +18,25 @@ data class Edge<T>(val source: T, val destination: T, val weight: Double, val id
 	override fun hashCode(): Int
 	{
 		val prime = 17
-		var code: Double = prime * weight
+		var code: Double = prime * distance
 		code = code * prime + id.hashCode()
 		code = code * prime + (source?.hashCode() ?: 0)
 		code = code * prime + (destination?.hashCode() ?: 0)
 		return code.toInt()
 	}
 
-	override fun toString(): String = "$source -- $weight --> $destination"
-	override fun compareTo(other: Edge<T>): Int = java.lang.Double.compare(this.weight, other.weight)
+	override fun toString(): String = "$source -- $distance --> $destination"
+	override fun compareTo(other: Edge<T>): Int = java.lang.Double.compare(this.distance, other.distance)
 
-	fun reverse(): Edge<T> = Edge(destination, source, weight, id)
+	fun acquire()
+	{
+		lock.acquire()
+	}
+
+	fun release()
+	{
+		lock.release()
+	}
+
+	fun reverse(): Edge<T> = Edge(destination, source, distance, id)
 }

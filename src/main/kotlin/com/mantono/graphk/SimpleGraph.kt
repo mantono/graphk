@@ -29,7 +29,7 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 	override fun edgeSize(e: T): Int = edges[e]?.size ?: 0
 	override fun isConnected(e: T): Boolean = edgeSize(e) != 0
 	override fun isConnected(start: T, end: T): Boolean = edgeBetween(start, end) != null
-	override fun getWeight(start: T, end: T): Double = edgeBetween(start, end)?.weight ?: Double.NaN
+	override fun getWeight(start: T, end: T): Double = edgeBetween(start, end)?.distance ?: Double.NaN
 	override fun edgeBetween(node1: T, node2: T): Edge<T>? = edges[node1]?.firstOrNull { it.destination == node2 }
 	override fun add(data: T): Boolean = nodes.add(data)
 	override fun clear()
@@ -41,7 +41,7 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 	override fun connect(start: T, end: T, weight: Double): Boolean
 	{
 		if (weight < 0.0 && !allowsNegativeWeights)
-			throw IllegalArgumentException("Trying to add negative weight ($weight), but negative wegihts are not alllowed")
+			throw IllegalArgumentException("Trying to add negative distance ($weight), but negative distances are not allowed")
 		return when(isConnected(start, end))
 		{
 			true -> when(multiGraph)
