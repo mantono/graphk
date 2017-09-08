@@ -22,10 +22,9 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 
 	override val numberOfEdges: Int = edges.size
 	override val nodeWithLeastEdges: T
-		get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
-	override val allNodes: Set<T>
-		get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+		get() = TODO("not implemented") //T // o change initializer of created properties use File | Settings | File Templates.
 
+	override val allNodes: Set<T> = nodes.toSet()
 	override fun edgeSize(e: T): Int = edges[e]?.size ?: 0
 	override fun isConnected(e: T): Boolean = edgeSize(e) != 0
 	override fun isConnected(start: T, end: T): Boolean = edgeBetween(start, end) != null
@@ -62,7 +61,24 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 
 	override fun remove(data: T): Boolean
 	{
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+		if(nodes.remove(data))
+		{
+			val edgesFromNode: Set<Edge<T>> = edges.remove(data) ?: emptySet()
+			if(directed)
+				removeAllEdgesLeadingToNode(data)
+			else
+				removeAllEdgesLeadingToNode(data, edgesFromNode)
+		}
+		return false
+	}
+
+	private fun removeAllEdgesLeadingToNode(data: T)
+	{
+		for(node in nodes)
+		{
+			val edgesFromNode: Set<Edge<T>>  = edges[node] ?: emptySet()
+
+		}
 	}
 
 	override fun disconnect(start: T, end: T): Boolean
