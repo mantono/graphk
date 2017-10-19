@@ -20,11 +20,9 @@ interface Graph<T, V: Edge<T, V>> : Collection<T>, Set<T> where T: Any
 
 interface MutableGraph<T, E: Edge<T, E>> : Graph<T, E>, MutableCollection<T>, MutableSet<T> where T: Any
 {
-	override val size: Int
 	override fun add(data: T): Boolean
 	override fun remove(data: T): Boolean
     override fun clear()
-	override operator fun contains(data: T): Boolean
 
 	fun connect(start: T, end: T, weight: E): Boolean
 	fun disconnect(start: T, end: T): Boolean

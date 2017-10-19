@@ -1,6 +1,8 @@
 package com.mantono.graphk
 
 import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 class DirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGraph<T, V>(nodes) where T: Any, V: DirectedEdge<T, V>
 {
@@ -46,16 +48,9 @@ class UndirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGr
 	override fun isConnected(node: T): Boolean = edgeSize(node) > 0
 }
 
-abstract open class AbstractSimpleGraph<T, V>(nodes: Collection<T>): MutableGraph<T, V> where T: Any, V: Edge<T, V>
+abstract class AbstractSimpleGraph<T, V>(nodes: Collection<T>): AbstractGraph<T,V>(nodes), MutableGraph<T, V> where T: Any, V: Edge<T, V>
 {
-	private val nodes: MutableSet<T> = HashSet(nodes)
-	private val edges: MutableMap<T, MutableSet<Edge<T, V>>> = HashMap(nodes.size, 0.8f)
 	override val multiGraph: Boolean = false
-	override val size: Int = nodes.size
-	override val allEdges: Map<T, Set<Edge<T, V>>>
-		get() = edges
-
-	override val allNodes: Set<T> = nodes.toSet()
 
 	override fun edgeSize(node: T): Int = edges[node]?.size ?: 0
 
@@ -80,63 +75,6 @@ abstract open class AbstractSimpleGraph<T, V>(nodes: Collection<T>): MutableGrap
 	{
 		nodes.clear()
 		edges.clear()
-	}
-
-	override fun connect(start: T, end: T, weight: V): Boolean
-	{
-		val edge = Edge<T, V>()
-	}
-
-	private fun disconnect(node: T)
-	{
-		for
-	}
-
-	override fun disconnect(start: T, end: T): Boolean
-	{
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun disconnect(start: T, end: T, weight: V): Boolean
-	{
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
-	override fun remove(node: T): Boolean
-	{
-		if(nodes.remove(node))
-		{
-			disconnect(node)
-			return true
-		}
-		return false
-	}
-
-
-	override fun disconnect(edge: Edge<T, V>): Boolean
-	{
-		return when(edge)
-		{
-			is DirectedEdge -> disconnect(edge)
-			is UndirectedEdge -> disconnect(edge)
-		}
-	}
-
-	fun disconnect(edge: DirectedEdge<T, V>): Boolean
-	{
-		if(!directed)
-			return false
-	}
-
-	fun disconnect(edge: UndirectedEdge<T, V>): Boolean
-	{
-		if(directed)
-			return false
-	}
-
-	override fun retainAll(elements: Collection<T>): Boolean
-	{
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 }
 
