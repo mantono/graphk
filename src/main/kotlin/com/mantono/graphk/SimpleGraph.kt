@@ -2,17 +2,148 @@ package com.mantono.graphk
 
 import java.util.*
 
-class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
-                     override val directed: Boolean = false,
-                     override val allowsNegativeWeights: Boolean = false,
-                     override val multiGraph: Boolean = false): MutableGraph<T>
+class DirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGraph<T, V>(nodes) where T: Any, V: DirectedEdge<T, V>
+{
+	override val directed: Boolean = true
+
+	override fun getWeights(start: T, end: T): List<V>
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun edgesFor(node: T): Set<Edge<T, V>>
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun edgesBetween(node1: T, node2: T): List<Edge<T, V>>
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun isConnected(node: T): Boolean = TODO()
+}
+
+class UndirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGraph<T, V>(nodes) where T: Any, V: UndirectedEdge<T, V>
+{
+	override val directed: Boolean = false
+
+	override fun getWeights(start: T, end: T): List<V>
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun edgesFor(node: T): Set<Edge<T, V>>
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun edgesBetween(node1: T, node2: T): List<Edge<T, V>>
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun isConnected(node: T): Boolean = edgeSize(node) > 0
+}
+
+abstract open class AbstractSimpleGraph<T, V>(nodes: Collection<T>): MutableGraph<T, V> where T: Any, V: Edge<T, V>
 {
 	private val nodes: MutableSet<T> = HashSet(nodes)
-	private val edges: MutableMap<T, MutableSet<Edge<T>>> = HashMap(nodes.size, 0.8f)
+	private val edges: MutableMap<T, MutableSet<Edge<T, V>>> = HashMap(nodes.size, 0.8f)
+	override val multiGraph: Boolean = false
 	override val size: Int = nodes.size
-	override val allEdges: Map<T, Set<Edge<T>>>
+	override val allEdges: Map<T, Set<Edge<T, V>>>
 		get() = edges
 
+	override val allNodes: Set<T> = nodes.toSet()
+
+	override fun edgeSize(node: T): Int = edges[node]?.size ?: 0
+
+	override fun isConnected(start: T, end: T): Boolean
+	{
+		val edgeSet: Set<Edge<T, V>> = edges[start] ?: return false
+		val found: Int =  edgeSet.asSequence()
+				.filter { end in it.nodes }
+				.count()
+		return found > 0
+	}
+
+	// These methods are same for multigraphs, single graphs and directed and undirected graphs
+	override fun add(node: T): Boolean = nodes.add(node)
+	override fun isEmpty(): Boolean = nodes.isEmpty()
+	override fun contains(node: T): Boolean = node in nodes
+	override fun containsAll(elements: Collection<T>): Boolean = nodes.containsAll(elements)
+	override fun iterator(): MutableIterator<T> = nodes.iterator()
+	override fun addAll(elements: Collection<T>): Boolean = nodes.addAll(elements)
+	override fun removeAll(elements: Collection<T>): Boolean = nodes.removeAll(elements)
+	override fun clear()
+	{
+		nodes.clear()
+		edges.clear()
+	}
+
+	override fun connect(start: T, end: T, weight: V): Boolean
+	{
+		val edge = Edge<T, V>()
+	}
+
+	private fun disconnect(node: T)
+	{
+		for
+	}
+
+	override fun disconnect(start: T, end: T): Boolean
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun disconnect(start: T, end: T, weight: V): Boolean
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun remove(node: T): Boolean
+	{
+		if(nodes.remove(node))
+		{
+			disconnect(node)
+			return true
+		}
+		return false
+	}
+
+
+	override fun disconnect(edge: Edge<T, V>): Boolean
+	{
+		return when(edge)
+		{
+			is DirectedEdge -> disconnect(edge)
+			is UndirectedEdge -> disconnect(edge)
+		}
+	}
+
+	fun disconnect(edge: DirectedEdge<T, V>): Boolean
+	{
+		if(!directed)
+			return false
+	}
+
+	fun disconnect(edge: UndirectedEdge<T, V>): Boolean
+	{
+		if(directed)
+			return false
+	}
+
+	override fun retainAll(elements: Collection<T>): Boolean
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+}
+
+/*
+@Deprecated("Legacy code")
+class Old()
+{
 	override fun containsAll(c: Collection<T>): Boolean = nodes.containsAll(c)
 	override fun isEmpty(): Boolean = nodes.isEmpty()
 	override fun contains(e: T): Boolean = nodes.contains(e)
@@ -27,9 +158,9 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 	override val allNodes: Set<T> = nodes.toSet()
 	override fun edgeSize(e: T): Int = edges[e]?.size ?: 0
 	override fun isConnected(e: T): Boolean = edgeSize(e) != 0
-	override fun isConnected(start: T, end: T): Boolean = edgeBetween(start, end) != null
-	override fun getWeight(start: T, end: T): Double = edgeBetween(start, end)?.weight ?: Double.NaN
-	override fun edgeBetween(node1: T, node2: T): Edge<T>? = edges[node1]?.firstOrNull { it.destination == node2 }
+	override fun isConnected(start: T, end: T): Boolean = edgesBetween(start, end).isNotEmpty()
+	override fun getWeights(start: T, end: T): List<V> = edgesBetween(start, end)?.weight ?: Double.NaN
+	override fun edgesBetween(node1: T, node2: T): List<Edge<T, V>> = edges[node1]?.firstOrNull { it.destination == node2 }
 	override fun add(data: T): Boolean = nodes.add(data)
 	override fun clear()
 	{
@@ -37,7 +168,7 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 		nodes.clear()
 	}
 
-	override fun connect(start: T, end: T, weight: Double): Boolean
+	override fun connect(start: T, end: T, weight: V): Boolean
 	{
 		if (weight < 0.0 && !allowsNegativeWeights)
 			throw IllegalArgumentException("Trying to add negative weight ($weight), but negative wegihts are not alllowed")
@@ -52,7 +183,7 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 		}
 	}
 
-	private fun addEdge(edge: Edge<T>): Boolean
+	private fun addEdge(edge: Edge<T, V>): Boolean
 	{
 		if(edges[edge.destination] == null)
 			edges[edge.destination] = HashSet(3)
@@ -68,6 +199,13 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 		}
 		return false
 	}
+
+	override fun disconnect(start: T, end: T, weight: V): Boolean
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun remove(edge: Edge<T, V>) = edges.remove()
 
 	private fun removeAllEdgesLeadingToNode(data: T)
 	{
@@ -119,10 +257,10 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 		if(directed)
 		{
 			edges.asSequence()
-				.map { it.value }
-				.flatMap { it.asSequence() }
-				.filter { it.source == node || it.destination == node }
-				.forEach { disconnect(it.source, it.destination) }
+					.map { it.value }
+					.flatMap { it.asSequence() }
+					.filter { it.source == node || it.destination == node }
+					.forEach { disconnect(it.source, it.destination) }
 		}
 		else
 		{
@@ -132,15 +270,10 @@ class SimpleGraph<T: Any>(nodes: Collection<T> = emptySet(),
 
 	private fun removeEdgeForNode(node: T, edge: Edge<T>): Boolean = edges[node]?.remove(edge) == true
 
-	override fun changeWeight(start: T, end: T, weight: Double): Boolean
-	{
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
-
 	override fun retainAll(elements: Collection<T>): Boolean
 	{
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 
-	override fun edgesFor(node: T): Set<Edge<T>> = edges[node] ?: emptySet()
-}
+	override fun edgesFor(node: T): Set<Edge<T, V>> = edges[node] ?: emptySet()
+}*/
