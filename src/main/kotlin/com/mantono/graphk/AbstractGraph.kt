@@ -5,7 +5,7 @@ package com.mantono.graphk
  * as well as for multi graphs and regular graphs.
  */
 abstract class AbstractGraph<T, V>(nodes: Collection<T> = HashSet(),
-                                   edges: Map<T, Set<Edge<T, V>>> = HashMap(nodes.size, 0.8f)): MutableGraph<T, V> where T: Any, V: Edge<T, V>
+                                   edges: Map<T, Set<Edge<T, V>>> = HashMap(nodes.size, 0.8f)): MutableGraph<T, V> where T: Any, V: Comparable<V>
 {
 
 	protected val nodes: MutableSet<T> = HashSet(nodes)

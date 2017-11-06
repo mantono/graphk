@@ -1,11 +1,42 @@
 package com.mantono.graphk
 
-import java.util.*
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-
-class DirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGraph<T, V>(nodes) where T: Any, V: DirectedEdge<T, V>
+class DirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGraph<T, V>(nodes) where T: Any, V: Comparable<V>
 {
+	override fun remove(node: T): Boolean
+	{
+		nodes
+			.map { edgesFor(it) }
+			.flatMap { it }
+			.filter { node in it.nodes }
+			.forEach { disconnect(it) }
+		return nodes.remove(node)
+	}
+
+	override fun disconnect(start: T, end: T): Boolean
+	{
+		return edges[start]?.let {
+			it.asSequence()
+				.filter { end in it.nodes }
+				.filter { disconnect(it) }
+				.any()
+		} ?: false
+	}
+
+	override fun disconnect(start: T, end: T, weight: V): Boolean = disconnect(DirectedEdge(start, end, weight))
+
+	override fun disconnect(edge: Edge<T, V>): Boolean = when(edge)
+	{
+		is UndirectedEdge -> false
+		is DirectedEdge -> edges[edge.start]?.let { it.remove(edge) } ?: false
+	}
+
+	override fun retainAll(elements: Collection<T>): Boolean
+	{
+		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	}
+
+	override fun connect(start: T, end: T, weight: V): Boolean = edges[start]!!.add(DirectedEdge(start, end, weight))
+
 	override val directed: Boolean = true
 
 	override fun getWeights(start: T, end: T): List<V>
@@ -13,10 +44,7 @@ class DirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGrap
 		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 
-	override fun edgesFor(node: T): Set<Edge<T, V>>
-	{
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
+	override fun edgesFor(node: T): Set<Edge<T, V>> = edges[node]!!.toSet()
 
 	override fun edgesBetween(node1: T, node2: T): List<Edge<T, V>>
 	{
@@ -48,7 +76,7 @@ class UndirectedGraph<T, V>(nodes: Collection<T> = emptySet()): AbstractSimpleGr
 	override fun isConnected(node: T): Boolean = edgeSize(node) > 0
 }
 
-abstract class AbstractSimpleGraph<T, V>(nodes: Collection<T>): AbstractGraph<T,V>(nodes), MutableGraph<T, V> where T: Any, V: Edge<T, V>
+abstract class AbstractSimpleGraph<T, V>(nodes: Collection<T>): AbstractGraph<T, V>(nodes), MutableGraph<T, V> where T: Any, V: Comparable<V>
 {
 	override val multiGraph: Boolean = false
 

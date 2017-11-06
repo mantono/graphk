@@ -1,6 +1,6 @@
 package com.mantono.graphk
 
-interface Graph<T, V: Edge<T, V>> : Collection<T>, Set<T> where T: Any
+interface Graph<T, V: Comparable<V>> : Collection<T>, Set<T> where T: Any
 {
 	override val size: Int
 	override operator fun contains(data: T): Boolean
@@ -10,7 +10,7 @@ interface Graph<T, V: Edge<T, V>> : Collection<T>, Set<T> where T: Any
 	val allEdges: Map<T, Set<Edge<T, V>>>
     val allNodes: Set<T>
 
-	fun edgeSize(data: T): Int
+	fun edgeSize(node: T): Int
 	fun isConnected(node: T): Boolean
 	fun isConnected(start: T, end: T): Boolean
 	fun getWeights(start: T, end: T): List<V>
@@ -18,10 +18,10 @@ interface Graph<T, V: Edge<T, V>> : Collection<T>, Set<T> where T: Any
 	fun edgesBetween(node1: T, node2: T): List<Edge<T, V>>
 }
 
-interface MutableGraph<T, E: Edge<T, E>> : Graph<T, E>, MutableCollection<T>, MutableSet<T> where T: Any
+interface MutableGraph<T, E: Comparable<E>> : Graph<T, E>, MutableCollection<T>, MutableSet<T> where T: Any
 {
-	override fun add(data: T): Boolean
-	override fun remove(data: T): Boolean
+	override fun add(node: T): Boolean
+	override fun remove(node: T): Boolean
     override fun clear()
 
 	fun connect(start: T, end: T, weight: E): Boolean
