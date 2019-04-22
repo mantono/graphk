@@ -3,6 +3,8 @@
 
 # Gradle
 .gradle
-gradle
-gradlew*
 build
+
+# Intellij
+*.iml
+*.idea
